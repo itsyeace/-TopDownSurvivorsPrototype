@@ -2,6 +2,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "AttributeComponent.h"
+#include "BulletPool.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -60,8 +61,11 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	if (UAttributeComponent* AttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
 	{
 		AttributeComponent->TakeDamage(Damage);
-		Deactivate();
 		UE_LOG(LogTemp, Warning, TEXT("Bullet hit the Player"));
+		if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))
+		{
+			BulletPool->ReturnBullet(this);
+		}
 	}
 }
 

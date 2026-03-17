@@ -16,7 +16,9 @@ public:
 	// Sets default values for this actor's properties
 	ABullet();
 
+	UFUNCTION(BlueprintCallable)
 	void Activate(FVector Location, FVector Direction);
+
 	void Deactivate();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Bullet")
