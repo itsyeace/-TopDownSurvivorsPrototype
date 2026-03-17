@@ -1,12 +1,16 @@
+# Unreal Engine
 Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
+
+# Visual Studio
 .vs/
 *.VC.db
 *.VC.opendb
 *.suo
-*.opensdf
 *.sdf
+*.opensdf
+
+# Logs
 *.log
-*.tmp
