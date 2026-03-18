@@ -11,6 +11,9 @@
 #include "AttributeComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "BulletPool.h"
+#include "Bullet.h"
 
 ATDSurvivorsProtoCharacter::ATDSurvivorsProtoCharacter()
 {
@@ -55,7 +58,15 @@ void ATDSurvivorsProtoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// stub
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABulletPool::StaticClass(), FoundActors);
+
+	if (!FoundActors.IsEmpty())
+	{
+		BulletPool = Cast<ABulletPool>(FoundActors[0]);
+	}
+
+	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ATDSurvivorsProtoCharacter::Fire, FireRate, true);
 }
 
 void ATDSurvivorsProtoCharacter::Tick(float DeltaSeconds)
@@ -63,4 +74,19 @@ void ATDSurvivorsProtoCharacter::Tick(float DeltaSeconds)
     Super::Tick(DeltaSeconds);
 
 	// stub
+}
+
+void ATDSurvivorsProtoCharacter::Fire()
+{
+	if (!BulletPool) return;
+
+	FVector Direction = GetActorForwardVector();
+	FVector SpawnLocation = (GetActorLocation() + (Direction * 150.f));
+
+	ABullet* Bullet = BulletPool->GetBullet();
+	if (Bullet)
+	{
+		Bullet->Activate(SpawnLocation, Direction);
+		BulletPool->GetActiveBulletCount();
+	}
 }

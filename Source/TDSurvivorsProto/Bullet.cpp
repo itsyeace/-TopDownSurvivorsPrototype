@@ -29,6 +29,8 @@ void ABullet::Activate(FVector Location, FVector Direction)
 	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	ProjectileMovement->Velocity = Direction.GetSafeNormal() * Speed;
 	ProjectileMovement->Activate();
+
+	GetWorldTimerManager().SetTimer(BulletTimerHandle, this, &ABullet::OnTimerExpired, 2.0f, false);
 }
 
 void ABullet::Deactivate()
@@ -61,11 +63,22 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	if (UAttributeComponent* AttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
 	{
 		AttributeComponent->TakeDamage(Damage);
-		UE_LOG(LogTemp, Warning, TEXT("Bullet hit the Player"));
-		if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))
-		{
-			BulletPool->ReturnBullet(this);
-		}
+	}
+
+	if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))
+	{
+		BulletPool->ReturnBullet(this);
+	}
+
+	GetWorldTimerManager().ClearTimer(BulletTimerHandle);
+}
+
+void ABullet::OnTimerExpired()
+{
+	ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner());
+	if (BulletPool)
+	{
+		BulletPool->ReturnBullet(this);
 	}
 }
 

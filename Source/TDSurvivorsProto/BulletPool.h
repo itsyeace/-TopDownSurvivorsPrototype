@@ -26,6 +26,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Pool")
 	int32 PoolSize = 30;
 
+	int32 GetActiveBulletCount() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,4 +40,6 @@ private:
 	TArray<ABullet*> AvailableBullets;
 
 	void ExpandPool();
+
+	int32 ActiveBulletCount = 0;
 };

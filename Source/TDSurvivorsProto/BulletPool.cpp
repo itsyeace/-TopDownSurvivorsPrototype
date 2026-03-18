@@ -19,6 +19,7 @@ ABullet* ABulletPool::GetBullet()
 
 	ABullet* Bullet = AvailableBullets.Last();
 	AvailableBullets.Pop();
+	ActiveBulletCount++;
 	return Bullet;
 }
 
@@ -27,6 +28,14 @@ void ABulletPool::ReturnBullet(ABullet* Bullet)
 	if (!Bullet) return;
 	Bullet->Deactivate();
 	AvailableBullets.Add(Bullet);
+	ActiveBulletCount--;
+}
+
+int32 ABulletPool::GetActiveBulletCount() const
+{
+	UE_LOG(LogTemp, Warning, TEXT("Active Bullets: %d"), ActiveBulletCount);
+	return ActiveBulletCount;
+	
 }
 
 // Called when the game starts or when spawned

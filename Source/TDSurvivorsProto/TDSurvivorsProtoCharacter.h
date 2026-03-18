@@ -9,6 +9,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UAttributeComponent;
+class ABulletPool;
 
 /**
  *  A controllable top-down perspective character
@@ -48,5 +49,15 @@ public:
 	/** Returns the Camera Boom component **/
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom.Get(); }
 
+private:
+
+	ABulletPool* BulletPool;
+
+	void Fire();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	float FireRate = 0.2f;
+
+	FTimerHandle FireRateTimerHandle;
 };
 
