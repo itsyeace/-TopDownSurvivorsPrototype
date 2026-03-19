@@ -26,6 +26,7 @@ ABullet* ABulletPool::GetBullet()
 void ABulletPool::ReturnBullet(ABullet* Bullet)
 {
 	if (!Bullet) return;
+	if (Bullet->IsActive == false) return;
 	Bullet->Deactivate();
 	AvailableBullets.Add(Bullet);
 	ActiveBulletCount--;
@@ -68,6 +69,7 @@ void ABulletPool::ExpandPool()
 	
 	if (Bullet)
 	{
+		Bullet->SetOwner(this);
 		Bullet->Deactivate();
 		AvailableBullets.Add(Bullet);
 	}

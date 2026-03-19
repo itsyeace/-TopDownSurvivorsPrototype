@@ -27,6 +27,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Bullet")
 	float Speed = 1500.f;
 
+	bool IsActive;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -50,5 +52,10 @@ private:
 	FTimerHandle BulletTimerHandle;
 
 	void OnTimerExpired();
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		FVector NormalImpulse, const FHitResult& Hit);
+
 
 };

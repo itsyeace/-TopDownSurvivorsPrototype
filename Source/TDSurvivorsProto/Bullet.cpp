@@ -12,6 +12,8 @@ ABullet::ABullet()
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
 	CollisionSphere->SetSphereRadius(15.f);
+	CollisionSphere->SetNotifyRigidBodyCollision(true);
+	CollisionSphere->BodyInstance.bUseCCD = true;
 	RootComponent = CollisionSphere;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
@@ -26,9 +28,10 @@ void ABullet::Activate(FVector Location, FVector Direction)
 {
 	SetActorLocation(Location);
 	SetActorHiddenInGame(false);
-	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ProjectileMovement->Velocity = Direction.GetSafeNormal() * Speed;
 	ProjectileMovement->Activate();
+	IsActive = true;
 
 	GetWorldTimerManager().SetTimer(BulletTimerHandle, this, &ABullet::OnTimerExpired, 2.0f, false);
 }
@@ -39,6 +42,7 @@ void ABullet::Deactivate()
 	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ProjectileMovement->StopMovementImmediately();
 	ProjectileMovement->Deactivate();
+	IsActive = false;
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +51,7 @@ void ABullet::BeginPlay()
 	Super::BeginPlay();
 	
 	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnOverlapBegin);
+	CollisionSphere->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 }
 
 // Called every frame
@@ -65,6 +70,11 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 		AttributeComponent->TakeDamage(Damage);
 	}
 
+	if (GetOwner() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("I HAVE NO OWNER! I am a stray bullet!"));
+	}
+
 	if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))
 	{
 		BulletPool->ReturnBullet(this);
@@ -80,5 +90,22 @@ void ABullet::OnTimerExpired()
 	{
 		BulletPool->ReturnBullet(this);
 	}
+}
+
+void ABullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!OtherActor || OtherActor == GetOwner()) return;
+
+	if (GetOwner() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("I HAVE NO OWNER! I am a stray bullet!"));
+	}
+
+	if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))
+	{
+		BulletPool->ReturnBullet(this);
+	}
+
+	GetWorldTimerManager().ClearTimer(BulletTimerHandle);
 }
 
