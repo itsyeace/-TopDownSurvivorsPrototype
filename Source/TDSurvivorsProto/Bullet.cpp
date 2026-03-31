@@ -63,16 +63,17 @@ void ABullet::Tick(float DeltaTime)
 
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+
+	if (GetOwner() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("I HAVE NO OWNER! I am a stray bullet!"));
+	}
+
 	if (!OtherActor || OtherActor == GetOwner()) return;
 
 	if (UAttributeComponent* AttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
 	{
 		AttributeComponent->TakeDamage(Damage);
-	}
-
-	if (GetOwner() == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("I HAVE NO OWNER! I am a stray bullet!"));
 	}
 
 	if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))
