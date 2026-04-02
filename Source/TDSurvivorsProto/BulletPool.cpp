@@ -34,7 +34,7 @@ void ABulletPool::ReturnBullet(ABullet* Bullet)
 
 int32 ABulletPool::GetActiveBulletCount() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Active Bullets: %d"), ActiveBulletCount);
+	//UE_LOG(LogTemp, Warning, TEXT("Active Bullets: %d"), ActiveBulletCount);
 	return ActiveBulletCount;
 	
 }

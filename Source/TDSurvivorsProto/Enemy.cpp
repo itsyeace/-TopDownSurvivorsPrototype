@@ -54,6 +54,21 @@ void AEnemy::HandleDeath(AActor* DeadActor)
 	UE_LOG(LogTemp, Warning, TEXT("The enemy %s has died!"), *GetName());
 }
 
+void AEnemy::Activate(FVector Location)
+{
+	SetActorHiddenInGame(false);
+	SetActorLocation(Location);
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+}
+
+void AEnemy::Deactivate()
+{
+	SetActorHiddenInGame(true);
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->DisableMovement();
+}
+
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor) return;

@@ -39,6 +39,11 @@ public:
 
 	ACharacter* PlayerPawn;
 
+	UFUNCTION(BlueprintCallable)
+	void Activate(FVector Location);
+
+	void Deactivate();
+
 private:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
