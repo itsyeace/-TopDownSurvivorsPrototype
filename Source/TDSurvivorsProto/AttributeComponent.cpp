@@ -3,6 +3,7 @@
 // Sets default values for this component's properties
 UAttributeComponent::UAttributeComponent()
 {
+	bIsInvincible = false;
 }
 
 
@@ -15,14 +16,24 @@ void UAttributeComponent::BeginPlay()
 	
 }
 
-void UAttributeComponent::TakeDamage(float Amount)
+void UAttributeComponent::ProcessDamage(float Amount)
 {
+	if (IsDead()) return;
+	if (Amount <= 0) return;
+	if (IsInvincible()) return; 
+
 	CurrentHealth = FMath::Clamp(CurrentHealth - Amount, 0.f, MaxHealth);
+	OnHealthChanged.Broadcast(MaxHealth, CurrentHealth, Amount);
 	
-	if (CurrentHealth <= 0.f)
+	if (IsDead())
 	{
 		OnDeath.Broadcast(GetOwner());
 		UE_LOG(LogTemp, Warning, TEXT("Character Is Dead!"));
 	}
+}
+
+bool UAttributeComponent::IsInvincible() const
+{
+	return bIsInvincible;
 }
 

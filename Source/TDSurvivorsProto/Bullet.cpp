@@ -73,7 +73,7 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 
 	if (UAttributeComponent* AttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
 	{
-		AttributeComponent->TakeDamage(Damage);
+		AttributeComponent->ProcessDamage(Damage);
 	}
 
 	if (ABulletPool* BulletPool = Cast<ABulletPool>(GetOwner()))

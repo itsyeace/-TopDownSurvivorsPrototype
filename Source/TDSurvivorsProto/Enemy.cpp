@@ -77,7 +77,7 @@ void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	{
 		if (UAttributeComponent* PlayerAttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
 		{
-			PlayerAttributeComponent->TakeDamage(AttackDamage);
+			PlayerAttributeComponent->ProcessDamage(AttackDamage);
 		}
 	}
 }

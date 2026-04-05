@@ -5,6 +5,7 @@
 #include "AttributeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor*, DeadActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHealthChanged, float, MaxHealth, float, CurrentHealth, float, DamageAmount);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,16 +23,27 @@ protected:
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float MaxHealth;
+
+	float GetMaxHealth() const { return MaxHealth; }
 
 	UPROPERTY(BlueprintAssignable)
 	FOnDeath OnDeath;
 
-	void TakeDamage(float Amount);
+	UPROPERTY(BlueprintAssignable)
+	FOnHealthChanged OnHealthChanged;
+
+	void ProcessDamage(float Amount);
 	float GetCurrentHealth() const { return CurrentHealth; }
+
+	bool IsDead() const { return CurrentHealth <= 0.f; }
+	bool IsInvincible() const;
 	
 private:
-
+	
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attributes", meta = (AllowPrivateAccess = "true"))
 	float CurrentHealth;
+
+	bool bIsInvincible;
 };
