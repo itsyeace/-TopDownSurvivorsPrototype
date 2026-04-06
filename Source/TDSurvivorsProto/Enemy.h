@@ -22,6 +22,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* CollisionSphere;
 
+	UAttributeComponent* TargetAttributeComponent;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,12 +45,21 @@ public:
 	void Activate(FVector Location);
 
 	void Deactivate();
+	
+	void ApplyDamageToTarget();
+
+	float GetAttackDamage() const { return AttackDamage; }
+
+	FTimerHandle DamageTimerHandle;
 
 private:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 		bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float MoveSpeed;

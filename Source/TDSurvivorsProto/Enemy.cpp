@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "TimerManager.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -28,6 +29,7 @@ void AEnemy::BeginPlay()
 	PlayerPawn = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
+	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OnOverlapEnd);
 	
 }
 
@@ -69,16 +71,29 @@ void AEnemy::Deactivate()
 	GetCharacterMovement()->DisableMovement();
 }
 
+void AEnemy::ApplyDamageToTarget()
+{
+	if (!TargetAttributeComponent) return;
+	TargetAttributeComponent->ProcessDamage(AttackDamage);
+}
+
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor) return;
 
-	if (OtherActor == PlayerPawn)
+	if (UAttributeComponent* PlayerAttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
 	{
-		if (UAttributeComponent* PlayerAttributeComponent = OtherActor->FindComponentByClass<UAttributeComponent>())
-		{
-			PlayerAttributeComponent->ProcessDamage(AttackDamage);
-		}
+			GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &AEnemy::ApplyDamageToTarget, 0.5f, true);
+			TargetAttributeComponent = PlayerAttributeComponent;
+			//PlayerAttributeComponent->ProcessDamage(AttackDamage);
 	}
+}
+
+void AEnemy::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!OtherActor) return;
+
+	GetWorldTimerManager().ClearTimer(DamageTimerHandle);
+	TargetAttributeComponent = nullptr;
 }
 
